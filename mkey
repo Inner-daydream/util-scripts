@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# This script is used to copy an ssh public key to a multipass instance
+unset host key
+set -e
+while getopts h:k: flag
+do
+    case "${flag}" in
+        h) host=${OPTARG};;
+        k) key=${OPTARG};;
+        *) echo "usage: $0 -h host -k key";;
+    esac
+done
+# check if arguments are set
+if [ -z "$host" ] || [ -z "$key" ]; then
+    echo "usage: $0 -h host -k key" && exit 1
+fi
+op item get "$key" --field 'public key' |
+multipass exec "$host" -- tee -a .ssh/authorized_keys 
+
+cat << EOF >> ~/.ssh/config
+
+Host $host
+  HostName $(multipass info "$host" --format json | jq -r ".info.$host.ipv4[0]")
+  User ubuntu
+  IdentityFile ~/.ssh/id_rsa
+EOF
