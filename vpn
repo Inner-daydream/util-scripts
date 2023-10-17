@@ -53,7 +53,7 @@ if [ -z "$action" ]; then
     usage
 fi
 if [ -z "$ssh_port" ]; then
-    ssh_port=22
+    ssh_port=222
 fi
 
 sshuttle_dir="${SSHUTTLE_DIR:-$HOME/.ssh-vpn}" 
@@ -88,7 +88,7 @@ if [ "$action" == "up" ]; then
         log_path="$sshuttle_dir/conn.log"
     fi
 
-    mkdir -p "$HOME/.ssh-vpn"
+    mkdir -p "$sshuttle_dir"
     nohup sshuttle  -e "ssh -o StrictHostKeyChecking=accept-new" -r "$ssh_user@$ssh_server:$ssh_port" "$vpn_subnet" &> "$log_path" &
     pid=$!
     if [ -z "$pid" ]; then
